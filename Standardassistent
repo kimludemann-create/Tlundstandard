@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Standardassistent – NS 8415 / NS 8417</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,serif;background:#f5f0e8;display:flex;height:100vh;overflow:hidden}
+#sidebar{width:240px;background:#faf7f2;border-right:1px solid #e0d9cc;display:flex;flex-direction:column;flex-shrink:0}
+#logo{padding:16px;border-bottom:1px solid #e0d9cc}
+#logo-inner{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+#logo-icon{width:34px;height:34px;border-radius:8px;background:#c8a96e;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0}
+#logo-text{font-weight:700;font-size:13px;color:#2c2416}
+#logo-sub{font-size:10px;color:#8a7a60}
+#std-btns{display:flex;gap:4px}
+.std-btn{flex:1;padding:5px 0;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:#ede8df;color:#5a4d38;transition:all .15s}
+.std-btn.active{background:#c8a96e;color:#fff}
+#nav{flex:1;overflow-y:auto;padding:8px 0}
+.nav-section{font-size:9px;font-weight:700;color:#9a8a6a;letter-spacing:1px;text-transform:uppercase;padding:8px 16px 4px}
+.nav-btn{width:100%;text-align:left;padding:7px 16px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#3d3020;font-family:Georgia,serif;transition:background .1s}
+.nav-btn:hover{background:#ede8df}
+#pdf-area{padding:12px 16px;border-top:1px solid #e0d9cc}
+#pdf-btn{width:100%;padding:8px;border-radius:8px;border:1.5px dashed #c8a96e;background:transparent;cursor:pointer;font-size:11px;color:#8a6a30;font-family:Georgia,serif}
+#pdf-clear{width:100%;margin-top:4px;padding:4px;border-radius:6px;border:none;background:#f0e8d8;cursor:pointer;font-size:10px;color:#8a6a30;font-family:Georgia,serif;display:none}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#header{padding:14px 24px;border-bottom:1px solid #e0d9cc;background:#faf7f2;display:flex;align-items:center;justify-content:space-between}
+#header-title{font-weight:700;font-size:16px;color:#2c2416}
+#header-badge{font-size:10px;color:#9a8a6a;font-family:monospace}
+#chat{flex:1;overflow-y:auto;padding:32px 48px}
+#start{max-width:680px;margin:0 auto}
+#start h1{font-size:36px;color:#2c2416;margin-bottom:8px}
+#start h1 span{color:#c8a96e}
+#start p{color:#6a5a40;margin-bottom:28px;font-size:15px;line-height:1.6}
+#suggestions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.sug-btn{padding:16px 18px;border-radius:10px;border:1.5px solid #e0d9cc;background:#fff;cursor:pointer;text-align:left;transition:border-color .15s;font-family:Georgia,serif}
+.sug-btn:hover{border-color:#c8a96e}
+.sug-cat{font-size:9px;font-weight:700;color:#c8a96e;letter-spacing:1px;margin-bottom:6px}
+.sug-q{font-size:13px;color:#2c2416;line-height:1.5}
+#disclaimer{padding:14px 18px;border-radius:10px;background:#fef9f0;border:1.5px solid #e8d9b8;display:flex;gap:10px;font-size:12px;color:#7a6040;line-height:1.6}
+#messages{max-width:720px;margin:0 auto;width:100%}
+.msg{display:flex;margin-bottom:20px}
+.msg.user{justify-content:flex-end}
+.msg-avatar{width:28px;height:28px;border-radius:6px;background:#c8a96e;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;margin-right:10px;flex-shrink:0;margin-top:2px}
+.msg-bubble{max-width:78%;padding:13px 16px;border-radius:4px 16px 16px 16px;background:#fff;color:#2c2416;font-size:13.5px;line-height:1.7;box-shadow:0 1px 3px rgba(0,0,0,.06);white-space:pre-wrap}
+.msg.user .msg-bubble{border-radius:16px 16px 4px 16px;background:#c8a96e;color:#fff}
+#typing{display:none;align-items:center;gap:10px;margin-bottom:20px;max-width:720px;margin-left:auto;margin-right:auto}
+.dot{width:6px;height:6px;border-radius:50%;background:#c8a96e;display:inline-block;animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+#input-area{padding:16px 48px 24px;background:#faf7f2;border-top:1px solid #e0d9cc}
+#input-inner{max-width:720px;margin:0 auto;display:flex;gap:10px}
+#user-input{flex:1;padding:13px 18px;border-radius:12px;border:1.5px solid #e0d9cc;background:#fff;font-size:14px;font-family:Georgia,serif;color:#2c2416;outline:none;transition:border-color .15s}
+#user-input:focus{border-color:#c8a96e}
+#send-btn{padding:13px 20px;border-radius:12px;border:none;background:#e0d9cc;color:#fff;cursor:default;font-size:18px;transition:background .15s}
+#send-btn.active{background:#c8a96e;cursor:pointer}
+#footer-note{max-width:720px;margin:8px auto 0;font-size:11px;color:#9a8a6a;text-align:center;display:none}
+</style>
+</head>
+<body>
+<div id="sidebar">
+  <div id="logo">
+    <div id="logo-inner">
+      <div id="logo-icon">S</div>
+      <div><div id="logo-text">Standardassistent</div><div id="logo-sub">NS 8415 · NS 8417</div></div>
+    </div>
+    <div id="std-btns">
+      <button class="std-btn active" onclick="setStd('Begge')">Begge</button>
+      <button class="std-btn" onclick="setStd('8415')">8415</button>
+      <button class="std-btn" onclick="setStd('8417')">8417</button>
+    </div>
+  </div>
+  <div id="nav"></div>
+  <div id="pdf-area">
+    <button id="pdf-btn" onclick="document.getElementById('pdf-input').click()">📎 Last opp kontrakt (PDF)</button>
+    <button id="pdf-clear" onclick="clearPdf()">Fjern dokument</button>
+    <input id="pdf-input" type="file" accept="application/pdf" style="display:none" onchange="handlePdf(event)">
+  </div>
+</div>
+<div id="main">
+  <div id="header">
+    <div id="header-title">Standardassistent</div>
+    <div id="header-badge">• NS 8415 + NS 8417</div>
+  </div>
+  <div id="chat">
+    <div id="start">
+      <h1>Hva trenger du å slå opp<span>?</span></h1>
+      <p>Still spørsmål om NS 8415 (underentreprise) eller NS 8417 (totalunderentreprise). Svarene er basert på standardenes faktiske tekst og er juridisk formulert med kildehenvisninger.</p>
+      <div id="suggestions">
+        <button class="sug-btn" onclick="send('Hvor mye er innestående i NS 8417, og når frigis det?')"><div class="sug-cat">NS 8417 · BETALING</div><div class="sug-q">Hvor mye er innestående, og når frigis det?</div></button>
+        <button class="sug-btn" onclick="send('Jeg er forsinket i prosjektet etter NS 8415. Hva gjelder for dagmulkt?')"><div class="sug-cat">NS 8415 · FORSINKELSE</div><div class="sug-q">Jeg er forsinket i prosjektet. Hva gjelder?</div></button>
+        <button class="sug-btn" onclick="send('Mange endringer i NS 8415 – hvordan er varsling og hva er grensen?')"><div class="sug-cat">NS 8415 · ENDRINGER</div><div class="sug-q">Mange endringer – hvordan er varsling?</div></button>
+        <button class="sug-btn" onclick="send('Hva er krav til sikkerhetsstillelse i NS 8417?')"><div class="sug-cat">NS 8417 · SIKKERHET</div><div class="sug-q">Krav til sikkerhetsstillelse i NS 8417?</div></button>
+      </div>
+      <div id="disclaimer"><span>ℹ️</span><div>Svarene er basert på den innlastede standardteksten og gir veiledning – <strong>ikke juridisk rådgivning</strong>. Verifiser alltid mot gjeldende kontraktsversjon.</div></div>
+    </div>
+    <div id="messages" style="display:none"></div>
+    <div id="typing"><div id="typing-avatar" class="msg-avatar">S</div><div class="msg-bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+  </div>
+  <div id="input-area">
+    <div id="input-inner">
+      <input id="user-input" placeholder="Still et spørsmål om NS 8415 eller NS 8417…" oninput="updateBtn()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFromInput()}">
+      <button id="send-btn" onclick="sendFromInput()">↑</button>
+    </div>
+    <div id="footer-note">⚠️ Veiledning – ikke juridisk rådgivning. Verifiser alltid mot gjeldende kontraktsversjon.</div>
+  </div>
+</div>
+<script>
+const SYSTEM = `Du er en juridisk presist NS-kontraktsassistent for prosjektledere hos Interiørfaghuset T. Lund AS. Du har fullstendig kunnskap om NS 8415:2008 (Norsk underentreprisekontrakt) og NS 8417:2011 (Alminnelige kontraktsbestemmelser for totalunderentrepriser).
+
+NS 8415 regulerer forholdet mellom hovedentreprenør (HE) og underentreprenør (UE).
+NS 8417 regulerer forholdet mellom totalentreprenør (TE) og totalunderentreprenør (TUE), der TUE påtar seg både prosjektering og utførelse.
+
+NS 8415 – SENTRALE PUNKTER:
+- Punkt 8: Varsler skriftlig, uten ugrunnet opphold. Preklusjon ved unnlatt varsling.
+- Punkt 9: UE stiller 10% sikkerhet i utførelsestiden, reduseres til 3% etter registreringsforretning. HE stiller 15%.
+- Punkt 22: HE kan pålegge endringer ved endringsordre. Maks 20% netto tillegg.
+- Punkt 23: Irregulær endringsordre – UE må varsle uten ugrunnet opphold.
+- Punkt 24: Fristforlengelse – varsles uten ugrunnet opphold, tapes ved unnlatt varsling.
+- Punkt 25: Vederlagsjustering – varsles uten ugrunnet opphold.
+- Punkt 28: Avdrag månedlig. 10% innestående trekkes til samlet innestående = 5% av kontraktssum, deretter ingen trekk. Innestående faktureres i sluttfaktura.
+- Punkt 29: Betalingsfrist 28 dager etter faktura.
+- Punkt 30: Forsinkelsesrenter. UE kan stanse med 24 timers skriftlig varsel ved vesentlig betalingsmislighold.
+- Punkt 33: Sluttoppstilling og sluttfaktura innen 2 måneder fra registreringsforretning/overtakelse.
+- Punkt 34: Dagmulkt 1‰ per hverdag, minimum kr 1500. Maks 10% av kontraktssum.
+- Punkt 36: Mangler – 5 års reklamasjonsfrist. UE har rett og plikt til utbedring.
+- Punkt 39: Hevning ved vesentlig mislighold, rimelig rettefrist, skriftlig erklæring.
+
+NS 8417 – SENTRALE PUNKTER:
+- Punkt 7: TUE stiller 10% sikkerhet, reduseres til 3%. TE stiller 17,5%.
+- Punkt 14: TUE har design-build ansvar, velger løsninger innenfor kontraktens rammer.
+- Punkt 16: TUE prosjekterer alt nødvendig, har veiledningsplikt overfor TE.
+- Punkt 24: TE har risikoen for egne løsninger og prosjektering.
+- Punkt 26: Innestående 7,5% av avdragsgrunnlag. Faktureres i sluttfaktura.
+- Punkt 27: Betalingsfrist 28 dager.
+- Punkt 31: Endringer – maks 20% netto tillegg.
+- Punkt 33: Fristforlengelse – varsles uten ugrunnet opphold.
+- Punkt 39: Sluttoppstilling innen 2 måneder fra overtakelse.
+- Punkt 40: Dagmulkt 1‰ per hverdag, minimum kr 3000. Maks 10%.
+- Punkt 42: Mangler – 5 års reklamasjonsfrist.
+- Punkt 46: Hevning ved vesentlig mislighold.
+
+Svar alltid: 1) Kort og direkte, 2) Med paragrafhenvisning (f.eks. NS 8415 punkt 28), 3) På norsk og faglig korrekt. Avslutt med: ⚠️ Veiledning – ikke juridisk rådgivning. Verifiser mot gjeldende kontraktsversjon.`;
+
+let history = [];
+let pdfBase64 = null;
+let pdfName = '';
+let activeStd = 'Begge';
+
+const nav8415 = [
+  ['Kap I – Innledende best.','Forklar Kap I i NS 8415 (virkeområde, definisjoner, kontraktsdokumenter)'],
+  ['Kap II – UEs ytelser','Forklar Kap II i NS 8415 (krav til utførelse, byggeplass, prosjektering)'],
+  ['Kap III – HEs ytelser','Forklar Kap III i NS 8415 (HEs medvirkningsplikt, prosjektering, koordinering)'],
+  ['Kap IV – Endringer','Forklar Kap IV i NS 8415 (endringer, irregulær endringsordre, fristforlengelse, vederlagsjustering)'],
+  ['Kap V – Vederlag og betaling','Forklar Kap V i NS 8415 (vederlag, fremdriftsbetaling, innestående, betalingsfrister)'],
+  ['Kap VI – Overtakelse','Forklar Kap VI i NS 8415 (overtakelsesforretning, registreringsforretning, sluttoppgjør)'],
+  ['Kap VII – Forsinkelse/mangler','Forklar Kap VII i NS 8415 (dagmulkt, samordningsplikt, mangler, reklamasjon)'],
+  ['Kap VIII – Hevning','Forklar Kap VIII i NS 8415 (avbestilling, oppsigelse, hevning ved mislighold)'],
+];
+const nav8417 = [
+  ['Kap I – Generelle best.','Forklar Kap I i NS 8417 (definisjoner, kontraktsdokumenter, sikkerhetsstillelse, forsikring)'],
+  ['Kap III – Kontraktsgjenstand','Forklar Kap III i NS 8417 (krav til kontraktsgjenstanden, funksjonskrav, lover og forskrifter)'],
+  ['Kap IV – TUEs gjennomføring','Forklar Kap IV i NS 8417 (prosjektering, utførelse, fremdrift, samordning)'],
+  ['Kap V – TE-ytelser','Forklar Kap V i NS 8417 (TEs medvirkning, grunnforhold, prosjekteringsrisiko)'],
+  ['Kap VI – Vederlag','Forklar Kap VI i NS 8417 (fakturering, innestående, betalingsfrister, regningsarbeid)'],
+  ['Kap VII – Endringer','Forklar Kap VII i NS 8417 (endringer, fristforlengelse, vederlagsjustering, uenighet)'],
+  ['Kap VIII – Avslutning','Forklar Kap VIII i NS 8417 (overtakelse, registreringsforretning, FDV-dokumentasjon, sluttoppgjør)'],
+  ['Kap IX – Kontraktsbrudd','Forklar Kap IX i NS 8417 (dagmulkt, samordningsplikt, mangler, reklamasjon, direktekrav)'],
+];
+
+function buildNav() {
+  const nav = document.getElementById('nav');
+  nav.innerHTML = '';
+  if (activeStd === 'Begge' || activeStd === '8415') {
+    const h = document.createElement('div'); h.className = 'nav-section'; h.textContent = 'NS 8415 – Underentreprise'; nav.appendChild(h);
+    nav8415.forEach(([label, q]) => { const b = document.createElement('button'); b.className = 'nav-btn'; b.textContent = label; b.onclick = () => { document.getElementById('user-input').value = q; updateBtn(); document.getElementById('user-input').focus(); }; nav.appendChild(b); });
+  }
+  if (activeStd === 'Begge' || activeStd === '8417') {
+    const h = document.createElement('div'); h.className = 'nav-section'; h.style.paddingTop = '12px'; h.textContent = 'NS 8417 – Totalunderentreprise'; nav.appendChild(h);
+    nav8417.forEach(([label, q]) => { const b = document.createElement('button'); b.className = 'nav-btn'; b.textContent = label; b.onclick = () => { document.getElementById('user-input').value = q; updateBtn(); document.getElementById('user-input').focus(); }; nav.appendChild(b); });
+  }
+}
+
+function setStd(s) {
+  activeStd = s;
+  document.querySelectorAll('.std-btn').forEach((b,i) => { b.classList.toggle('active', ['Begge','8415','8417'][i] === s); });
+  buildNav();
+}
+
+function updateBtn() {
+  const v = document.getElementById('user-input').value.trim();
+  const btn = document.getElementById('send-btn');
+  btn.classList.toggle('active', v.length > 0);
+}
+
+function handlePdf(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => { pdfBase64 = reader.result.split(',')[1]; pdfName = file.name; document.getElementById('pdf-btn').textContent = '📄 ' + pdfName.slice(0,24) + (pdfName.length>24?'…':''); document.getElementById('pdf-clear').style.display = 'block'; };
+  reader.readAsDataURL(file);
+}
+
+function clearPdf() { pdfBase64 = null; pdfName = ''; document.getElementById('pdf-btn').textContent = '📎 Last opp kontrakt (PDF)'; document.getElementById('pdf-clear').style.display = 'none'; document.getElementById('pdf-input').value = ''; }
+
+function sendFromInput() { const v = document.getElementById('user-input').value.trim(); if (v) { document.getElementById('user-input').value = ''; updateBtn(); send(v); } }
+
+async function send(text) {
+  document.getElementById('start').style.display = 'none';
+  document.getElementById('messages').style.display = 'block';
+  document.getElementById('footer-note').style.display = 'block';
+
+  addMsg('user', text);
+  history.push({role:'user', content: text});
+
+  document.getElementById('typing').style.display = 'flex';
+  scrollBottom();
+
+  let apiMessages = history.map((m,i) => {
+    if (m.role === 'user' && pdfBase64 && i === history.length-1) {
+      return {role:'user', content:[{type:'text',text:m.content},{type:'document',source:{type:'base64',media_type:'application/pdf',data:pdfBase64}}]};
+    }
+    return {role:m.role, content:m.content};
+  });
+
+  try {
+    const res = await fetch('/api/chat', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:apiMessages})});
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Beklager, fikk ikke svar.';
+    document.getElementById('typing').style.display = 'none';
+    addMsg('assistant', reply);
+    history.push({role:'assistant', content:reply});
+  } catch(e) {
+    document.getElementById('typing').style.display = 'none';
+    addMsg('assistant', 'Feil ved tilkobling til API. Prøv igjen.');
+  }
+  scrollBottom();
+}
+
+function addMsg(role, text) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div'); div.className = 'msg ' + role;
+  if (role === 'assistant') { const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'S'; div.appendChild(av); }
+  const bubble = document.createElement('div'); bubble.className = 'msg-bubble'; bubble.textContent = text; div.appendChild(bubble);
+  msgs.appendChild(div);
+}
+
+function scrollBottom() { const c = document.getElementById('chat'); c.scrollTop = c.scrollHeight; }
+
+buildNav();
+</script>
+</body>
+</html>
